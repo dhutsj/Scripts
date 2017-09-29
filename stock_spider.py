@@ -3,7 +3,10 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-
+import json
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 def getHTMLText(url):
     try:
@@ -38,26 +41,28 @@ def getStockInfo(lst, stockURL, fpath):
             stockInfo = soup.find('div', attrs={'class': 'stock-bets'})
 
             name = stockInfo.find_all(attrs={'class': 'bets-name'})[0]
-            infoDict.update({'股票名称': name.text.split()[0]})
+            #print name.text
+            infoDict.update({'股票名称': name.text})
 
             keyList = stockInfo.find_all('dt')
             valueList = stockInfo.find_all('dd')
             for i in range(len(keyList)):
                 key = keyList[i].text
-                print u'%s' % key
+                #print u'%s' % key
                 val = valueList[i].text
-                print val
+                #print val
                 infoDict[key] = val
 
             with open(fpath, 'a') as f:
-                print str(infoDict)
-                f.write(str(infoDict) + '\n')
+                str = json.dumps(infoDict, encoding="UTF-8", ensure_ascii=False)
+                print str
+                #f.write(str(infoDict) + '\n')
+                f.write(str + '\n')
                 count = count + 1
                 print("\r当前进度: {:.8f}%".format(count * 100 / len(lst)))
         except Exception as e:
                 print e
                 count = count + 1
-                print str(infoDict)
                 print("\r当前进度: {:.8f}%".format(count * 100 / len(lst)))
                 continue
 
